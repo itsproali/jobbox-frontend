@@ -4,7 +4,6 @@ import { toast, Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import Loading from "./components/reusable/Loading";
-import { useLazyGetUserDetailsQuery } from "./redux/auth/authApi";
 import { loadingOff, setUserEmail } from "./redux/auth/authSlice";
 import routes from "./routes/routes";
 import auth from "./utils/firebase.config";
@@ -12,11 +11,10 @@ import auth from "./utils/firebase.config";
 function App() {
   const dispatch = useDispatch();
   const {
-    user: { email, role },
+    user: { email },
     isLoading,
     error,
   } = useSelector((state) => state.auth);
-  const [getDetails, details] = useLazyGetUserDetailsQuery();
 
   // Set User Email
   useEffect(() => {
@@ -27,14 +25,7 @@ function App() {
         dispatch(loadingOff());
       }
     });
-  });
-
-  // Getting User Details
-  useEffect(() => {
-    if (email && !role) {
-      getDetails(email);
-    }
-  }, [email, getDetails, role]);
+  }, [dispatch]);
 
   // show error
   useEffect(() => {
@@ -44,7 +35,7 @@ function App() {
   }, [error]);
 
   // show loading
-  if (isLoading || details.isLoading) {
+  if (isLoading) {
     return <Loading />;
   }
   return (

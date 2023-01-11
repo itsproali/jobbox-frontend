@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import candidate from "../../assets/candidate.svg";
 import employer from "../../assets/employer.svg";
+import Loading from "../../components/reusable/Loading";
+import { useLazyGetUserDetailsQuery } from "../../redux/auth/authApi";
 import CandidateRegistration from "./CandidateRegistration";
 import EmployerRegistration from "./EmployerRegistration";
 
@@ -10,12 +12,29 @@ const AccountCreator = () => {
   const navigate = useNavigate();
   const { type } = useParams();
   const {
-    user: { role },
+    user: { email, role },
   } = useSelector((state) => state.auth);
 
+  const [getDetails, details] = useLazyGetUserDetailsQuery();
+
+  // Getting User Details
   useEffect(() => {
-    if (role) navigate("/");
-  }, [role, navigate]);
+    if (email && !role) {
+      getDetails(email);
+    }
+  }, [email, getDetails, role]);
+
+  useEffect(() => {
+    if (!email) {
+      navigate("/login");
+    } else if (role) {
+      navigate("/");
+    }
+  }, [role, navigate, email]);
+
+  if (details.isLoading) {
+    return <Loading />;
+  }
 
   if (type === "candidate") {
     return <CandidateRegistration />;

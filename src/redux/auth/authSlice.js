@@ -60,8 +60,7 @@ const authSlice = createSlice({
       .addCase(createUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
-        state.user.email = null;
-        state.user.role = null;
+        state.user = { email: null, role: null };
       })
       .addCase(createUser.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -71,15 +70,13 @@ const authSlice = createSlice({
       .addCase(createUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message;
-        state.user.email = null;
-        state.user.role = null;
+        state.user = { email: null, role: null };
       });
     builder
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
-        state.user.email = null;
-        state.user.role = null;
+        state.user = { email: null, role: null };
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -89,15 +86,13 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message;
-        state.user.email = null;
-        state.user.role = null;
+        state.user = { email: null, role: null };
       });
     builder
       .addCase(googleLogin.pending, (state) => {
         state.isLoading = true;
         state.error = null;
-        state.user.email = null;
-        state.user.role = null;
+        state.user = { email: null, role: null };
       })
       .addCase(googleLogin.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -107,8 +102,7 @@ const authSlice = createSlice({
       .addCase(googleLogin.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message;
-        state.user.email = null;
-        state.user.role = null;
+        state.user = { email: null, role: null };
       });
   },
 });
