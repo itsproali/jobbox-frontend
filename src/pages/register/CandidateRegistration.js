@@ -39,7 +39,7 @@ const CandidateRegistration = () => {
   }, [isSuccess, navigate]);
 
   const onSubmit = async (inputData) => {
-    await registerUser({ role: "candidate", ...inputData });
+    await registerUser({ role: "candidate", ...inputData, appliedJob: [] });
   };
 
   if (isLoading) return <Loading />;

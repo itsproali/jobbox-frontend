@@ -1,14 +1,25 @@
-import React from "react";
-import { useParams } from "react-router-dom";
-import meeting from "../assets/meeting.jpg";
-import { BsArrowRightShort, BsArrowReturnRight } from "react-icons/bs";
-import { useGetJobDetailsQuery } from "../redux/job/jobApi";
-import Loading from "../components/reusable/Loading";
+import React, { useEffect } from "react";
 import { toast } from "react-hot-toast";
+import { BsArrowReturnRight, BsArrowRightShort } from "react-icons/bs";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import meeting from "../assets/meeting-min.jpg";
+import Loading from "../components/reusable/Loading";
+import {
+  useApplyJobMutation,
+  useAskQuestionMutation,
+  useGetJobDetailsQuery,
+  useSendReplyMutation,
+} from "../redux/job/jobApi";
 
 const JobDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
   const { data, isLoading, isError, error } = useGetJobDetailsQuery(id);
+  const [apply, res] = useApplyJobMutation();
+  const [askQuestion] = useAskQuestionMutation();
+  const [sendReply] = useSendReplyMutation();
   const {
     companyName,
     position,
@@ -21,28 +32,75 @@ const JobDetails = () => {
     requirements,
     responsibilities,
     overview,
-    // queries,
+    queries,
     _id,
+    postBy,
   } = data?.data || {};
 
-  if (isLoading) {
+  const isApplied = user.appliedJob ? user.appliedJob.includes(_id) : false;
+
+  useEffect(() => {
+    if (isError || res.isError) {
+      toast.error(error || res.error);
+    }
+  }, [isError, error, res]);
+
+  if (res.isSuccess) {
+    toast.success("Applied Successfully", { id: "success" });
+    navigate("/jobs");
+  }
+
+  const handleApply = () => {
+    if (user.role !== "candidate") {
+      toast.error("Please log in as candidate to apply..!");
+      navigate("/register");
+      return;
+    }
+
+    const data = { userId: user._id, email: user.email, jobId: _id };
+    apply(data);
+  };
+
+  const handleQuestion = (e) => {
+    e.preventDefault();
+    const question = e.target.question.value;
+    if (!question) return;
+    const data = { jobId: _id, userId: user._id, email: user.email, question };
+    console.log(data);
+    askQuestion(data);
+  };
+
+  const handleReply = ({ e, id }) => {
+    e.preventDefault();
+    const reply = e.target.reply.value;
+    if (!reply) return;
+    const data = { questionId: id, reply };
+    sendReply(data);
+    e.target.reply.value = "";
+  };
+
+  if (isLoading || res.isLoading) {
     return <Loading />;
   }
 
-  if (isError) {
-    toast.error(error, { id: "error" });
-  }
-
   return (
-    <div className="container mx-auto pt-16 grid grid-cols-12 gap-5">
-      <div className="col-span-9 mb-10">
+    <div className="container mx-auto pt-16 grid grid-cols-12 gap-5 mb-12">
+      <div className="col-span-12 lg:col-span-9 mb-10">
         <div className="h-80 rounded-xl overflow-hidden">
-          <img className="h-full w-full object-cover" src={meeting} alt="" />
+          <img className="h-full w-full object-cover" src={meeting} alt="meeting" />
         </div>
         <div className="space-y-5">
           <div className="flex justify-between items-center mt-5">
             <h1 className="text-xl font-semibold text-primary">{position}</h1>
-            <button className="btn">Apply</button>
+            {user.role !== "employer" && (
+              <button
+                className="btn"
+                onClick={handleApply}
+                disabled={isApplied}
+              >
+                {!isApplied ? "Apply" : "Applied"}
+              </button>
+            )}
           </div>
           <div>
             <h1 className="text-primary text-lg font-medium mb-3">Overview</h1>
@@ -51,7 +109,7 @@ const JobDetails = () => {
           <div>
             <h1 className="text-primary text-lg font-medium mb-3">Skills</h1>
             <ul>
-              {skills.map((skill, i) => (
+              {skills?.map((skill, i) => (
                 <li key={i} className="flex items-center">
                   <BsArrowRightShort /> <span>{skill}</span>
                 </li>
@@ -63,7 +121,7 @@ const JobDetails = () => {
               Requirements
             </h1>
             <ul>
-              {requirements.map((skill, i) => (
+              {requirements?.map((skill, i) => (
                 <li key={i} className="flex items-center">
                   <BsArrowRightShort /> <span>{skill}</span>
                 </li>
@@ -75,7 +133,7 @@ const JobDetails = () => {
               Responsibilities
             </h1>
             <ul>
-              {responsibilities.map((skill, i) => (
+              {responsibilities?.map((skill, i) => (
                 <li key={i} className="flex items-center">
                   <BsArrowRightShort /> <span>{skill}</span>
                 </li>
@@ -86,11 +144,11 @@ const JobDetails = () => {
         <hr className="my-5" />
         <div>
           <div>
-            <h1 className="text-xl font-semibold text-primary mb-5">
+            <h3 className="text-xl font-semibold text-primary mb-5">
               General Q&A
-            </h1>
-            {/* <div className="text-primary my-2">
-              {queries.map(({ question, email, reply, id }) => (
+            </h3>
+            <div className="text-primary my-2">
+              {queries?.map(({ question, email, reply, id }) => (
                 <div>
                   <small>{email}</small>
                   <p className="text-lg font-medium">{question}</p>
@@ -103,36 +161,50 @@ const JobDetails = () => {
                     </p>
                   ))}
 
-                  <div className="flex gap-3 my-5">
-                    <input placeholder="Reply" type="text" className="w-full" />
-                    <button
-                      className="shrink-0 h-14 w-14 bg-primary/10 border border-primary hover:bg-primary rounded-full transition-all  grid place-items-center text-primary hover:text-white"
-                      type="button"
+                  {postBy === user._id && (
+                    <form
+                      onSubmit={(e) => handleReply({ e, id })}
+                      className="flex gap-3 my-5"
                     >
-                      <BsArrowRightShort size={30} />
-                    </button>
-                  </div>
+                      <input
+                        placeholder="Reply"
+                        type="text"
+                        className="w-full"
+                        name="reply"
+                      />
+                      <button
+                        className="shrink-0 h-14 w-14 bg-primary/10 border border-primary hover:bg-primary rounded-full transition-all  grid place-items-center text-primary hover:text-white"
+                        type="submit"
+                      >
+                        <BsArrowRightShort size={30} />
+                      </button>
+                    </form>
+                  )}
                 </div>
               ))}
-            </div> */}
-
-            <div className="flex gap-3 my-5">
-              <input
-                placeholder="Ask a question..."
-                type="text"
-                className="w-full"
-              />
-              <button
-                className="shrink-0 h-14 w-14 bg-primary/10 border border-primary hover:bg-primary rounded-full transition-all  grid place-items-center text-primary hover:text-white"
-                type="button"
-              >
-                <BsArrowRightShort size={30} />
-              </button>
             </div>
+
+            {user.role !== "employer" && (
+              <form onSubmit={handleQuestion} className="flex gap-3 my-5">
+                <input
+                  placeholder="Ask a question..."
+                  type="text"
+                  className="w-full"
+                  name="question"
+                  id="question"
+                />
+                <button
+                  className="shrink-0 h-14 w-14 bg-primary/10 border border-primary hover:bg-primary rounded-full transition-all  grid place-items-center text-primary hover:text-white"
+                  type="submit"
+                >
+                  <BsArrowRightShort size={30} />
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>
-      <div className="col-span-3">
+      <div className="col-span-12 lg:col-span-3">
         <div className="rounded-xl bg-primary/10 p-5 text-primary space-y-5">
           <div>
             <p>Experience</p>

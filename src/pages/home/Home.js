@@ -1,20 +1,7 @@
-import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useLazyGetUserDetailsQuery } from "../../redux/auth/authApi";
+import React from "react";
 import Landing from "./Landing";
 
 const Home = () => {
-  const {
-    user: { email, role },
-  } = useSelector(state => state.auth);
-  const [getDetails] = useLazyGetUserDetailsQuery();
-
-  // Getting User Details
-  useEffect(() => {
-    if (email && !role) {
-      getDetails(email);
-    }
-  }, [email, getDetails, role]);
   return (
     <>
       <Landing />

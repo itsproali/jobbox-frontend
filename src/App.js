@@ -4,6 +4,7 @@ import { toast, Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import Loading from "./components/reusable/Loading";
+import { useGetUserDetailsQuery } from "./redux/auth/authApi";
 import { loadingOff, setUserEmail } from "./redux/auth/authSlice";
 import routes from "./routes/routes";
 import auth from "./utils/firebase.config";
@@ -15,6 +16,11 @@ function App() {
     isLoading,
     error,
   } = useSelector((state) => state.auth);
+  const skip = email ? false : true;
+  const data = useGetUserDetailsQuery(email, {
+    refetchOnMountOrArgChange: true,
+    skip,
+  });
 
   // Set User Email
   useEffect(() => {
@@ -35,7 +41,7 @@ function App() {
   }, [error]);
 
   // show loading
-  if (isLoading) {
+  if (isLoading || data.isLoading) {
     return <Loading />;
   }
   return (

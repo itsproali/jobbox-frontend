@@ -20,10 +20,10 @@ const PostedJob = () => {
 
   return (
     <div className="">
-      <h1 className="text-3xl text-center my-10">
+      <h1 className="text-3xl font-semibold text-center my-10">
         Your <span className="text-primary">Posted</span> Jobs
       </h1>
-      <div className="grid grid-cols-2 gap-5 mt-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
         {data?.data?.map((job) => (
           <JobCard jobData={job} key={job._id} />
         ))}

@@ -19,7 +19,7 @@ const authApi = apiSlice.injectEndpoints({
       },
     }),
     getUserDetails: builder.query({
-      query: (email) => `/user/${email}`,
+      query: (email) => ({ url: `/user/${email}` }),
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -34,4 +34,4 @@ const authApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useRegisterUserMutation, useLazyGetUserDetailsQuery } = authApi;
+export const { useRegisterUserMutation, useGetUserDetailsQuery } = authApi;

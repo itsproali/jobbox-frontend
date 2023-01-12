@@ -6,7 +6,7 @@ const apiSlice = createApi({
     baseUrl: process.env.REACT_APP_SERVER,
   }),
   endpoints: (builder) => ({}),
-  tagTypes: ["jobs"]
+  tagTypes: ["jobs", "jobDetails"],
 });
 
 export default apiSlice;
