@@ -9,7 +9,7 @@ import { usePostJobMutation } from "../../redux/job/jobApi";
 const AddJob = () => {
   const navigate = useNavigate();
   const {
-    user: { companyName, _id },
+    user: { companyName, _id, email, firstName, lastName },
   } = useSelector((state) => state.auth);
   const { handleSubmit, register, control } = useForm({
     defaultValues: { companyName },
@@ -33,7 +33,10 @@ const AddJob = () => {
     usePostJobMutation();
 
   const onSubmit = (data) => {
-    postJob({ ...data, postBy: _id });
+    postJob({
+      ...data,
+      postBy: { _id, email, name: firstName + " " + lastName },
+    });
   };
 
   if (isLoading) {

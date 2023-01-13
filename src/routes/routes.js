@@ -13,6 +13,7 @@ import EmployerDashboard from "../pages/employeeDashboard/EmployerDashboard";
 import CandidateDashboard from "../pages/candidateDashboard/CandidateDashboard";
 import AppliedJobs from "../pages/candidateDashboard/AppliedJobs";
 import PostedJob from "../pages/employeeDashboard/PostedJob";
+import DirectMessage from "../components/reusable/DirectMessage";
 
 const routes = createBrowserRouter([
   {
@@ -84,6 +85,10 @@ const routes = createBrowserRouter([
       {
         path: "applied-jobs",
         element: <AppliedJobs />,
+      },
+      {
+        path: "direct-message",
+        element: <DirectMessage />,
       },
     ],
   },

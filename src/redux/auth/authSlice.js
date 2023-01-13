@@ -53,7 +53,7 @@ const authSlice = createSlice({
     },
     setUser: (state, action) => {
       state.user = action.payload;
-    },
+  },
     setApplied: (state, action) => {
       state.user.appliedJob.push(action.payload);
     },

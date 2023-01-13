@@ -11,6 +11,7 @@ import {
   useGetJobDetailsQuery,
   useSendReplyMutation,
 } from "../redux/job/jobApi";
+import { useCreateMessageMutation } from "../redux/message/messageApi";
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -20,6 +21,7 @@ const JobDetails = () => {
   const [apply, res] = useApplyJobMutation();
   const [askQuestion] = useAskQuestionMutation();
   const [sendReply] = useSendReplyMutation();
+  const [createMessage] = useCreateMessageMutation();
   const {
     companyName,
     position,
@@ -33,6 +35,7 @@ const JobDetails = () => {
     responsibilities,
     overview,
     queries,
+    applicants,
     _id,
     postBy,
   } = data?.data || {};
@@ -59,6 +62,11 @@ const JobDetails = () => {
 
     const data = { userId: user._id, email: user.email, jobId: _id };
     apply(data);
+    const members = [
+      { email: user.email, name: user.firstName + " " + user.lastName },
+      { email: postBy.email, name: postBy.name },
+    ];
+    createMessage(members);
   };
 
   const handleQuestion = (e) => {
@@ -87,20 +95,33 @@ const JobDetails = () => {
     <div className="container mx-auto pt-16 grid grid-cols-12 gap-5 mb-12">
       <div className="col-span-12 lg:col-span-9 mb-10">
         <div className="h-80 rounded-xl overflow-hidden">
-          <img className="h-full w-full object-cover" src={meeting} alt="meeting" />
+          <img
+            className="h-full w-full object-cover"
+            src={meeting}
+            alt="meeting"
+          />
         </div>
         <div className="space-y-5">
           <div className="flex justify-between items-center mt-5">
             <h1 className="text-xl font-semibold text-primary">{position}</h1>
-            {user.role !== "employer" && (
-              <button
-                className="btn"
-                onClick={handleApply}
-                disabled={isApplied}
-              >
-                {!isApplied ? "Apply" : "Applied"}
-              </button>
-            )}
+            <div className="flex items-center gap-4">
+              <p className="text-primary">
+                Applicants:{" "}
+                <span className="font-bold">{applicants?.length || 0}</span>
+              </p>
+              {user.role !== "employer" && (
+                <button
+                  className="btn"
+                  onClick={handleApply}
+                  disabled={isApplied}
+                >
+                  {!isApplied ? "Apply" : "Applied"}
+                </button>
+              )}
+              {postBy._id === user._id && (
+                <button className="btn">Close</button>
+              )}
+            </div>
           </div>
           <div>
             <h1 className="text-primary text-lg font-medium mb-3">Overview</h1>
@@ -161,7 +182,7 @@ const JobDetails = () => {
                     </p>
                   ))}
 
-                  {postBy === user._id && (
+                  {postBy._id === user._id && (
                     <form
                       onSubmit={(e) => handleReply({ e, id })}
                       className="flex gap-3 my-5"

@@ -20,8 +20,8 @@ const PostedJob = () => {
 
   return (
     <div className="">
-      <h1 className="text-3xl font-semibold text-center my-10">
-        Your <span className="text-primary">Posted</span> Jobs
+      <h1 className="text-lg text-gray-500/70 font-medium py-10">
+        Your Posted Jobs: {data?.data?.length}
       </h1>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
         {data?.data?.map((job) => (
