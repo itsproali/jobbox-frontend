@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   messages: [],
-  currentUser: {},
+  currentMessage: { name: "", email: "", conversation: [] },
 };
 
 const messageSlice = createSlice({
@@ -12,11 +12,15 @@ const messageSlice = createSlice({
     setMessages: (state, action) => {
       state.messages = action.payload;
     },
-    setCurrentUser: (state, action) => {
-      state.currentUser = action.payload;
+    setCurrentMessage: (state, action) => {
+      state.currentMessage = { ...action.payload, conversation: [] };
+    },
+    setCurrentConversation: (state, action) => {
+      state.currentMessage.conversation = action.payload;
     },
   },
 });
 
-export const { setMessages, setCurrentUser } = messageSlice.actions;
+export const { setMessages, setCurrentMessage, setCurrentConversation } =
+  messageSlice.actions;
 export default messageSlice.reducer;
