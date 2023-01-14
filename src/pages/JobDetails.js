@@ -8,6 +8,7 @@ import Loading from "../components/reusable/Loading";
 import {
   useApplyJobMutation,
   useAskQuestionMutation,
+  useCloseJobMutation,
   useGetJobDetailsQuery,
   useSendReplyMutation,
 } from "../redux/job/jobApi";
@@ -22,6 +23,7 @@ const JobDetails = () => {
   const [askQuestion] = useAskQuestionMutation();
   const [sendReply] = useSendReplyMutation();
   const [createMessage] = useCreateMessageMutation();
+  const [closeJob] = useCloseJobMutation()
   const {
     companyName,
     position,
@@ -38,6 +40,7 @@ const JobDetails = () => {
     applicants,
     _id,
     postBy,
+    status,
   } = data?.data || {};
 
   const isApplied = user.appliedJob ? user.appliedJob.includes(_id) : false;
@@ -67,6 +70,15 @@ const JobDetails = () => {
       { email: postBy.email, name: postBy.name },
     ];
     createMessage(members);
+  };
+
+  // Handle Close this Job
+  const handleClose = () => {
+    const isConfirm = window.confirm(
+      "Are you sure you you want to Close the job.?"
+    );
+    if (!isConfirm) return;
+    closeJob(_id);
   };
 
   const handleQuestion = (e) => {
@@ -113,13 +125,19 @@ const JobDetails = () => {
                 <button
                   className="btn"
                   onClick={handleApply}
-                  disabled={isApplied}
+                  disabled={isApplied || status === "closed"}
                 >
-                  {!isApplied ? "Apply" : "Applied"}
+                  {status === "closed"
+                    ? "closed"
+                    : !isApplied
+                    ? "Apply"
+                    : "Applied"}
                 </button>
               )}
               {postBy._id === user._id && (
-                <button className="btn">Close</button>
+                <button className="btn" onClick={handleClose} disabled={status === "closed"}>
+                  {status === "closed" ? "Closed" : "Close" }
+                </button>
               )}
             </div>
           </div>

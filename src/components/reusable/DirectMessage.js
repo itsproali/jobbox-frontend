@@ -40,6 +40,7 @@ const DirectMessage = () => {
   const handleSend = (e) => {
     e.preventDefault();
     const message = e.target.message.value;
+    if(!message) return;
     const data = { _id: currentMessage._id, message, author: email };
     send(data);
     e.target.message.value = "";

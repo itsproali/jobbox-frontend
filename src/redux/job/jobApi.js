@@ -55,6 +55,14 @@ const jobApi = apiSlice.injectEndpoints({
       query: (userId) => `/posted/${userId}`,
       providesTags: ["jobs"],
     }),
+    // Close a posted Job by Job Id
+    closeJob: builder.mutation({
+      query: (id) => ({
+        url: `/close/${id}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["jobs", "jobDetails"],
+    }),
     // Get All Applied jobs by a candidate email
     getAppliedJobs: builder.query({
       query: (email) => `/applied-jobs/${email}`,
@@ -96,6 +104,7 @@ export const {
   useGetJobsQuery,
   useGetJobDetailsQuery,
   useGetPostedJobsQuery,
+  useCloseJobMutation,
   useApplyJobMutation,
   useGetAppliedJobsQuery,
   useAskQuestionMutation,

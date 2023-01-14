@@ -35,6 +35,7 @@ const AddJob = () => {
   const onSubmit = (data) => {
     postJob({
       ...data,
+      status: "open",
       postBy: { _id, email, name: firstName + " " + lastName },
     });
   };
