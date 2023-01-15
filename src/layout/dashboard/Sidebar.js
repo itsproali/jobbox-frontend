@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaChevronLeft } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { FiLogOut } from "react-icons/fi";
-import {logOutUser} from "../../redux/auth/authSlice"
+import { logOutUser } from "../../redux/auth/authSlice";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -19,6 +19,7 @@ const Sidebar = () => {
   const employerRoutes = [
     { name: "Add Job", path: "/dashboard/add-job" },
     { name: "Posted Job", path: "/dashboard/posted-job" },
+    { name: "Candidates", path: "/dashboard/candidates" },
     { name: "Direct Message", path: "/dashboard/direct-message" },
   ];
 

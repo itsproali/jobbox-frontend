@@ -9,6 +9,7 @@ import { toast } from "react-hot-toast";
 import { useSelector, useDispatch } from "react-redux";
 import { FaUserAlt } from "react-icons/fa";
 import { setCurrentMessage } from "../../redux/message/messageSlice";
+import Spinner from "./Spinner";
 
 const DirectMessage = () => {
   const dispatch = useDispatch();
@@ -40,7 +41,7 @@ const DirectMessage = () => {
   const handleSend = (e) => {
     e.preventDefault();
     const message = e.target.message.value;
-    if(!message) return;
+    if (!message) return;
     const data = { _id: currentMessage._id, message, author: email };
     send(data);
     e.target.message.value = "";
@@ -102,7 +103,9 @@ const DirectMessage = () => {
       ) : (
         <>
           {conversation.isLoading ? (
-            <p>Loading..</p>
+            <div className="col-span-9">
+              <Spinner />
+            </div>
           ) : (
             <div className="col-span-9 flex flex-col justify-between">
               <div className="px-4 py-2 bg-gray-100 flex items-center gap-8 shadow-lg">

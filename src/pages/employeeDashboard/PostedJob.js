@@ -2,15 +2,23 @@ import React, { useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import Loading from "../../components/reusable/Loading";
-import { useCloseJobMutation, useGetPostedJobsQuery } from "../../redux/job/jobApi";
+import {
+  useCloseJobMutation,
+  useGetPostedJobsQuery,
+} from "../../redux/job/jobApi";
 import { IoMdClose } from "react-icons/io";
 
 const PostedJob = () => {
   const {
-    user: { _id },
-  } = useSelector((state) => state.auth);
-  const { data, isLoading, isError, error } = useGetPostedJobsQuery(_id);
-const [closeJob] = useCloseJobMutation()
+    auth: {
+      user: { email },
+    },
+    job: { postedJobs },
+  } = useSelector((state) => state);
+  const { isLoading, isError, error } = useGetPostedJobsQuery(email, {
+    skip: email ? false : true,
+  });
+  const [closeJob] = useCloseJobMutation();
 
   useEffect(() => {
     if (isError) {
@@ -32,8 +40,8 @@ const [closeJob] = useCloseJobMutation()
 
   return (
     <div className="">
-      <h1 className="text-lg text-gray-500/70 font-medium py-10">
-        Your Posted Jobs: {data?.data?.length}
+      <h1 className="pl-4 text-lg text-gray-500/70 font-medium py-10">
+        Your Posted Jobs: {postedJobs.length || 0}
       </h1>
 
       <div className="w-[95%] mx-auto mt-6 rounded-lg bg-gray-50 shadow-lg overflow-auto scrollbar">
@@ -49,7 +57,7 @@ const [closeJob] = useCloseJobMutation()
             </tr>
           </thead>
           <tbody className="text-center">
-            {data?.data?.map((item, i) => {
+            {postedJobs?.map((item, i) => {
               const { _id, position, salaryRange, applicants, status } =
                 item || {};
               return (
@@ -67,7 +75,11 @@ const [closeJob] = useCloseJobMutation()
                   </td>
                   <td className="py-3">
                     <button
-                      title={status  === "closed" ? "This is job is closed" : "Close this job"}
+                      title={
+                        status === "closed"
+                          ? "This is job is closed"
+                          : "Close this job"
+                      }
                       className="bg-secondary p-2 rounded-full active:scale-90 duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-white"
                       onClick={() => handleClose(_id)}
                       disabled={status === "closed"}

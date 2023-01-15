@@ -1,6 +1,6 @@
 import apiSlice from "../api/apiSlice";
 import { setApplied } from "../auth/authSlice";
-import { setAppliedJobs, setJobs } from "./jobSlice";
+import { setAppliedJobs, setJobs, setPostedJobs } from "./jobSlice";
 
 const jobApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -52,9 +52,29 @@ const jobApi = apiSlice.injectEndpoints({
     }),
     // Get All Posted job by Employer user Id
     getPostedJobs: builder.query({
-      query: (userId) => `/posted/${userId}`,
+      query: (email) => `/posted/${email}`,
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data.success) {
+            dispatch(setPostedJobs(data.data));
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      },
       providesTags: ["jobs"],
     }),
+    // Shortlist/Reject an applicant
+    statusUpdate: builder.mutation({
+      query: (data) => ({
+        url: "/status-update",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["jobs"],
+    }),
+
     // Close a posted Job by Job Id
     closeJob: builder.mutation({
       query: (id) => ({
@@ -104,6 +124,7 @@ export const {
   useGetJobsQuery,
   useGetJobDetailsQuery,
   useGetPostedJobsQuery,
+  useStatusUpdateMutation,
   useCloseJobMutation,
   useApplyJobMutation,
   useGetAppliedJobsQuery,

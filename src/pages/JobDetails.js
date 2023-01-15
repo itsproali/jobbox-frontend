@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { BsArrowReturnRight, BsArrowRightShort } from "react-icons/bs";
 import { useSelector } from "react-redux";
@@ -17,13 +17,14 @@ import { useCreateMessageMutation } from "../redux/message/messageApi";
 const JobDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [isApplied, setIsApplied] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const { data, isLoading, isError, error } = useGetJobDetailsQuery(id);
   const [apply, res] = useApplyJobMutation();
   const [askQuestion] = useAskQuestionMutation();
   const [sendReply] = useSendReplyMutation();
   const [createMessage] = useCreateMessageMutation();
-  const [closeJob] = useCloseJobMutation()
+  const [closeJob] = useCloseJobMutation();
   const {
     companyName,
     position,
@@ -43,13 +44,24 @@ const JobDetails = () => {
     status,
   } = data?.data || {};
 
-  const isApplied = user.appliedJob ? user.appliedJob.includes(_id) : false;
-
   useEffect(() => {
     if (isError || res.isError) {
       toast.error(error || res.error);
     }
   }, [isError, error, res]);
+
+  // const isApplied = user.appliedJob ? user.appliedJob.includes(_id) : false;
+
+  useEffect(() => {
+    if (user.appliedJob) {
+      for (const item of user.appliedJob) {
+        if (item.jobId === _id) {
+          setIsApplied(true);
+          break;
+        }
+      }
+    }
+  }, [_id, user]);
 
   if (res.isSuccess) {
     toast.success("Applied Successfully", { id: "success" });
@@ -63,7 +75,14 @@ const JobDetails = () => {
       return;
     }
 
-    const data = { userId: user._id, email: user.email, jobId: _id };
+    const data = {
+      userId: user._id,
+      email: user.email,
+      name: user.firstName + " " + user.lastName,
+      address: user.city + ", " + user.country,
+      status: "pending",
+      jobId: _id,
+    };
     apply(data);
     const members = [
       { email: user.email, name: user.firstName + " " + user.lastName },
@@ -135,8 +154,12 @@ const JobDetails = () => {
                 </button>
               )}
               {postBy._id === user._id && (
-                <button className="btn" onClick={handleClose} disabled={status === "closed"}>
-                  {status === "closed" ? "Closed" : "Close" }
+                <button
+                  className="btn"
+                  onClick={handleClose}
+                  disabled={status === "closed"}
+                >
+                  {status === "closed" ? "Closed" : "Close"}
                 </button>
               )}
             </div>

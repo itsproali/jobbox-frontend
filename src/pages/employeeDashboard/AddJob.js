@@ -36,7 +36,8 @@ const AddJob = () => {
     postJob({
       ...data,
       status: "open",
-      postBy: { _id, email, name: firstName + " " + lastName },
+      applicants: [],
+      postBy: { _id, email, name: firstName + " " + lastName},
     });
   };
 

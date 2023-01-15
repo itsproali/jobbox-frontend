@@ -6,19 +6,26 @@
 
 <br>
 
+### Credentials:
+**Employer:** email- employer@gmail.com, password- 12345678
+
+**Candidate:** email- candidate@gmail.com, password- 12345678
+
+<br>
+
 ## Key Features:
 
 **Employer**
 
 - The Employer can see the application count for an open position.
 - The employer can close any position at any time.
-- He/she should be able to see the candidate's detail information. (there will be another route to show all the candidate by filtering with job title)
+- He/she should be able to see the candidate's detail information.
 - The employer can send a direct message to the candidate.
 
 **Candidate**
 
-- Candidates can filter the "applied job" based on date and approval state.
 - Candidates can reply to the direct message, like a real-time chat application.
+- Candidates can filter the "applied job" based on date and approval state.
 
 <br>
 
